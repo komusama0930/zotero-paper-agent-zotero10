@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Unofficial modifications maintained by komusama0930; 2026-10-13. See NOTICE.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -196,7 +194,7 @@ test('manifest permits Zotero 10 and preserves the identity and required update 
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'compatibility/patched/manifest.json')));
   assert.equal(manifest.applications.zotero.strict_max_version, '10.*');
   assert.equal(manifest.applications.zotero.id, 'zoteropaperagent@github.com');
-  assert.equal(manifest.version, '3.1.1.17');
+  assert.equal(manifest.version, '3.1.1.18');
   assert.equal(manifest.applications.zotero.update_url, 'https://github.com/windfollowingheart/zotero-paper-agent/releases/download/release/update.json');
 });
 
@@ -383,4 +381,85 @@ test('formula parsing preserves code currency escaped dollars unfinished streams
   const highlighted=ctx.renderMarkdownWithKeywords('$x^2$ x',['x']);
   assert.equal((highlighted.match(/keyword-highlight/g)||[]).length,1);
   assert.match(highlighted,/<math /);
+});
+
+test('formula cache reuses success and fallback output and evicts old entries', () => {
+  const ctx=mathContext(); let calls=0;
+  const original=ctx.paperAgentKaTeX.renderToString;
+  ctx.paperAgentKaTeX.renderToString=(...args)=>{calls++;return original(...args)};
+  const text=String.raw`$x^2$ $\unknowncommand{x}$`;
+  const html=ctx.renderMarkdownWithKeywords(text);
+  for(let i=0;i<100;i++) assert.equal(ctx.renderMarkdownWithKeywords(text),html);
+  assert.equal(calls,2);
+  for(let i=0;i<300;i++) ctx.renderMarkdownWithKeywords(`$a_${i}$`);
+  ctx.renderMarkdownWithKeywords(text);
+  assert.equal(calls,304);
+});
+
+test('stream block rendering matches full Markdown including reference definitions and partial math', () => {
+  const ctx=mathContext();
+  const text=String.raw`# Title
+
+Paragraph $x^2$ and [source][ref].
+
+- item
+  - nested
+
+> quote
+
+| A | B |
+| - | - |
+| 1 | 2 |
+
+$$\frac{a}{b}$$
+
+\begin unfinished
+
+[ref]: https://example.com`;
+  for(let i=1;i<=text.length;i++) {
+    const source=text.slice(0,i);
+    assert.equal(ctx.paperAgentMarkdownBlocks(source).join(''),ctx.renderMarkdownWithKeywords(source));
+  }
+});
+
+function streamFixture() {
+  const ctx=mathContext();
+  const timers=new Map(), cleanups=new Set(); let serial=0;
+  const win={performance:{now:()=>0},setTimeout:fn=>{timers.set(++serial,fn);return serial},clearTimeout:id=>timers.delete(id),addEventListener(){},removeEventListener(){}};
+  const document={defaultView:win,createElementNS:()=>makeNode()};
+  function makeNode() {
+    return {ownerDocument:document,dataset:{originalMessage:''},style:{},isConnected:true,children:[],
+      replaceChildren(){this.children=[]},appendChild(node){node.parent=this;this.children.push(node)},
+      replaceWith(node){node.parent=this.parent;this.parent.children.splice(this.parent.children.indexOf(this),1,node)},
+      remove(){this.parent.children.splice(this.parent.children.indexOf(this),1)}};
+  }
+  const answer=makeNode(),thinking=makeNode(),panel=makeNode();
+  const scroll={scrollTop:0,clientHeight:100,scrollHeight:100};
+  ctx.addon={data:{paperAgentUICleanups:cleanups}};
+  const renderer=ctx.paperAgentCreateStreamRenderer(answer,thinking,panel,scroll);
+  const tick=()=>{for(const fn of [...timers.values()]) fn()};
+  return {ctx,answer,thinking,panel,scroll,renderer,timers,cleanups,tick};
+}
+
+test('stream chunks coalesce, retain completed DOM, respect scrolling and finish without delayed writes', () => {
+  const f=streamFixture();
+  for(const content of ['# Title','\n\n','$x^2$','\n\n']) f.renderer.push({type:'content',content});
+  assert.equal(f.timers.size,1);assert.equal(f.answer.children.length,0);
+  f.tick(); const heading=f.answer.children[0], formula=f.answer.children[1];
+  f.scroll.scrollHeight=1000;f.scroll.scrollTop=10;
+  for(const content of ['Next',' paragraph',' **bold**']) f.renderer.push({type:'content',content});
+  f.renderer.push({type:'reasoning_content',content:'late reasoning'});
+  f.renderer.finish();
+  assert.equal(f.answer.children[0],heading);assert.equal(f.answer.children[1],formula);
+  assert.equal(f.answer.children.map(node=>node.innerHTML).join(''),f.ctx.renderMarkdownWithKeywords(f.answer.dataset.originalMessage));
+  assert.equal(f.thinking.textContent,'late reasoning');assert.equal(f.scroll.scrollTop,10);
+  assert.equal(f.timers.size,0);assert.equal(f.cleanups.size,0);
+  const source=f.answer.dataset.originalMessage;
+  f.renderer.push({type:'content',content:'ignored'});assert.equal(f.answer.dataset.originalMessage,source);
+});
+
+test('shutdown cancels pending stream rendering and removes cleanup registration', () => {
+  const f=streamFixture();f.renderer.push({type:'content',content:'pending'});
+  for(const cleanup of [...f.cleanups]) cleanup();
+  assert.equal(f.timers.size,0);assert.equal(f.cleanups.size,0);assert.equal(f.answer.children.length,0);
 });

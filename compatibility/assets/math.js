@@ -1,6 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Unofficial modifications by komusama0930, 2026-10-13; see NOTICE.
   function paperAgentRegisterMath(markdown) {
+    // Bound both entry count and retained HTML; never retain whole conversations.
+    const cache = new Map();
+    let cacheSize = 0;
+    const remember = (key, html) => {
+      const size = key.length + html.length;
+      if (size > 2 * 1024 * 1024) return;
+      while (cache.size >= 256 || cacheSize + size > 2 * 1024 * 1024) {
+        const oldest = cache.keys().next().value;
+        cacheSize -= oldest.length + cache.get(oldest).length;
+        cache.delete(oldest);
+      }
+      cache.set(key, html); cacheSize += size;
+    };
     const escaped = (source, position) => {
       let count = 0;
       while (position > 0 && source[--position] === "\\") count++;
@@ -59,13 +72,22 @@
       const { display, opening, closing } = token.meta;
       const tag = token.block ? "div" : "span";
       const kind = display ? "paper-agent-math-display" : "paper-agent-math-inline";
+      const key = JSON.stringify([token.block, display, opening, closing, token.content]);
+      if (cache.has(key)) {
+        const html = cache.get(key);
+        cache.delete(key); cache.set(key, html);
+        return html;
+      }
+      let result;
       try {
         if (token.content.length > 20000) throw new Error("Formula too long");
         const html = paperAgentKaTeX.renderToString(token.content, { displayMode: display, throwOnError: true, trust: false, strict: "ignore", maxExpand: 1000, maxSize: 10, output: "htmlAndMathml" });
-        return `<${tag} class="paper-agent-math ${kind}">${html}</${tag}>`;
+        result = `<${tag} class="paper-agent-math ${kind}">${html}</${tag}>`;
       } catch (_) {
-        return `<${tag} class="paper-agent-math-source ${kind}" title="公式未能解析，保留原文">${markdown.utils.escapeHtml(opening + token.content + closing)}</${tag}>`;
+        result = `<${tag} class="paper-agent-math-source ${kind}" title="公式未能解析，保留原文">${markdown.utils.escapeHtml(opening + token.content + closing)}</${tag}>`;
       }
+      remember(key, result);
+      return result;
     };
     // Highlight text tokens only, so search cannot change MathML or formula layout.
     markdown.renderer.rules.text = (tokens, index, options, env) => {

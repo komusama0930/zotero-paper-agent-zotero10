@@ -15,6 +15,7 @@
 - 七套可编辑的文献阅读提示词、可搜索的模型和提示词选择面板。
 - 打开侧栏默认新建本地对话，旧会话保留在历史中。
 - 流式及历史回答的 Markdown 排版，包括可滚动表格与代码块。
+- 流式性能优化：有界公式缓存、100–250ms 合并刷新、复用未变化段落的 DOM；结束立即显示完整回答，向上阅读时保持滚动位置。
 - 本地 KaTeX 公式渲染：`$…$`、`$$…$$`、`\(...\)`、`\[...\]`；分数、积分、矩阵、长公式滚动及错误回退。
 - OpenAI 兼容 Chat Completions，以及可选 Responses 流式传输。
 
@@ -39,7 +40,7 @@ node --check compatibility/patched/content/scripts/zoteropaperagent.js
 node --test compatibility/tests/runtime.test.cjs
 ```
 
-下载脚本只访问上游官方 GitHub release，强制核验 SHA-256；已下载的文件亦重新核验。输出为 `dist/zotero-paper-agent-3.1.1.17.xpi`。生成文件与原包均不纳入版本控制。
+下载脚本只访问上游官方 GitHub release，强制核验 SHA-256；已下载的文件亦重新核验。输出为 `dist/zotero-paper-agent-3.1.1.18.xpi`。生成文件与原包均不纳入版本控制。
 
 在 Zotero「工具 → 插件」齿轮菜单选择「从文件安装插件」，安装本地生成的 XPI 后重启。**沿用上游插件 ID，会替换已有 Paper Agent 插件**。建议备份 Zotero 配置；回退时重新安装上游合适版本。本地包保留上游更新地址，未来上游更新可能替换这些修改，可在 Zotero 插件管理中关闭该插件自动更新。
 
@@ -51,7 +52,7 @@ node --test compatibility/tests/runtime.test.cjs
 
 ## 验证与限制
 
-测试环境：Zotero 10.0.6 / macOS。23项 Node 回归测试与52项隔离 Zotero 原生检查通过；后者使用合成 PDF 和模拟模型回答，不上传个人文献。云端 OCR及所有模型服务未做完整在线验证。Windows、Linux 和其他 Zotero 版本未验证。
+测试环境：Zotero 10.0.6 / macOS。27项 Node 回归测试与57项隔离 Zotero 原生检查通过；后者使用合成 PDF 和模拟模型回答，不上传个人文献。云端 OCR及所有模型服务未做完整在线验证。Windows、Linux 和其他 Zotero 版本未验证。
 
 本地 PDF 提取依赖 Zotero 内部 worker API，未来升级可能需要调整。扫描件、加密文件和长全文可能受提取能力或模型上下文长度限制。多窗口仍共享上游 API 状态，不保证独立并行会话。Markdown 支持基础结构及 KaTeX 数学公式，尚未新增代码语法着色；KaTeX 不支持全部 LaTeX 宏包。
 

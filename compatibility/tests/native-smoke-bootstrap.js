@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Unofficial modifications maintained by komusama0930; 2026-10-13. See NOTICE.
 async function startup() {
   const profile = Services.dirsvc.get("ProfD", Components.interfaces.nsIFile).path;
   if (profile !== __PROFILE__) return;
@@ -199,6 +197,52 @@ async function startup() {
       check(`${dark ? "dark" : "light"} Markdown code and links have readable contrast`, contrast(codeStyle.color, preStyle.backgroundColor) >= 4.5 && contrast(linkStyle.color, background) >= 4.5);
       check(`${dark ? "dark" : "light"} text controls and hints have readable contrast`, [values.root, values.button, values.input, values.placeholder, values.hint].every(value => value >= 4.5));
     }
+    // Synthetic streams only: no provider request and no personal document.
+    await api.createChatSession();
+    const performanceChatID = api.chatID;
+    const longAnswer = Array.from({length:40}, (_, i) => `### 推导 ${i+1}\n\n研究段落：给出推导依据和限制。 $E_${i}=mc^2$\n\n$$\\int_0^1 x^{${i+1}}\\,dx=\\frac{1}{${i+2}}$$\n\n`).join("");
+    let burstTime;
+    api.completion = async ({streamCallback}) => {
+      const started = win.performance.now();
+      for(let i=0;i<longAnswer.length;i+=11) streamCallback({type:"content",content:longAnswer.slice(i,i+11)});
+      burstTime = win.performance.now()-started;
+      return {userRefs:[]};
+    };
+    input.value = "Synthetic streaming performance test";
+    const started = win.performance.now();
+    chat.querySelector("#zotero-paper-agent-send-message-button").click();
+    await waitUntil(() => api.historyManager.getMessageListByChatSessionID(performanceChatID).length === 2);
+    const longNode=answerNodes().find(node=>node.textContent.includes("推导 40"));
+    result.streamingPerformance={characters:longAnswer.length,chunks:Math.ceil(longAnswer.length/11),callbackMs:burstTime,completionObservedMs:win.performance.now()-started};
+    check("long burst stream flushes all 80 formulas before history persistence", longNode.querySelectorAll(".katex").length === 80 && api.historyManager.getMessageListByChatSessionID(performanceChatID)[1].content === longAnswer);
+    const finalHTML=longNode.innerHTML;
+    await Zotero.Promise.delay(350);
+    check("completion cancels delayed stream writes",longNode.innerHTML===finalHTML);
+    await api.createChatSession();
+    const incrementalID=api.chatID;
+    let savedHeading,savedMath,incrementalNode;
+    const scroller=chat.querySelector("#zotero-paper-agent-message-container");
+    api.completion=async({streamCallback})=>{
+      streamCallback({type:"content",content:"# Stable heading\n\n$x^2$\n\n"});
+      await Zotero.Promise.delay(150);
+      incrementalNode=answerNodes().find(node=>node.querySelector("h1")?.textContent === "Stable heading");
+      savedHeading=incrementalNode.querySelector("h1"); savedMath=incrementalNode.querySelector(".katex");
+      for(let i=0;i<10;i++) {
+        streamCallback({type:"content",content:`Paragraph ${i}. `.repeat(50)+"\n\n"});
+        await Zotero.Promise.delay(120);
+      }
+      scroller.scrollTop=0;
+      streamCallback({type:"reasoning_content",content:"Late reasoning must not erase the answer"});
+      streamCallback({type:"content",content:"Final paragraph."});
+      await Zotero.Promise.delay(150);
+      check("stream does not pull reader back to bottom",scroller.scrollTop === 0);
+      return {userRefs:[]};
+    };
+    input.value="Incremental streaming DOM test";
+    chat.querySelector("#zotero-paper-agent-send-message-button").click();
+    await waitUntil(()=>api.historyManager.getMessageListByChatSessionID(incrementalID).length===2);
+    check("stream retains completed heading and formula DOM",incrementalNode.querySelector("h1")===savedHeading && incrementalNode.querySelector(".katex")===savedMath);
+    check("late reasoning preserves streamed answer",incrementalNode.textContent.includes("Final paragraph."));
     body.remove();
     await addon.hooks.onShutdown();
     check("sidepane unregistered on shutdown", !Zotero.ItemPaneManager.customSectionData.options.some(option => option.paneID === options.paneID));

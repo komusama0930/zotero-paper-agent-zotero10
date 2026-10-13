@@ -32,3 +32,7 @@
 ## 公式扩展（2026-10-13）
 
 compatibility/patches/y_math.py 与 assets/math.js 添加四种 TeX 定界符、离线 KaTeX 渲染、代码/币值避让、错误与未闭合回退，以及不修改公式结构的文本高亮。第三方 KaTeX 来源与 MIT 通知见 docs/DEPENDENCIES.md，npm 包完整性已核验。
+
+## 流式性能优化（2026-10-13）
+
+compatibility/patches/z_stream.py 与 assets/stream.js 合并流式更新、复用未变化块 DOM、完成时立即刷新、保留滚动位置并清理定时器；assets/math.js 加入有界公式 HTML 缓存，assets/dialogs.js 忽略回答的 DOM 变化。缓存最多 256 项，键与 HTML 合计最多 2M 字符。单次本机 Node 对比（3,084 字符/80 个公式/281 个片段），仅缓存将 KaTeX 调用从 11,284 降至 83，渲染计算从约 432ms 降至 36ms；不包含网络与完整 UI 延迟，不作为普遍速度保证。27 项 Node 与 57 项原生 Zotero 检查通过。

@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Unofficial modifications maintained by komusama0930; 2026-10-13. See NOTICE.
   function paperAgentEnhanceDialogs(chatUI) {
     const win = chatUI.ownerDocument.defaultView;
     let active = null;
@@ -72,7 +70,11 @@
         else if (!e.shiftKey && chatUI.ownerDocument.activeElement === last) { e.preventDefault(); first?.focus(); }
       }
     };
-    const observer = new win.MutationObserver(refresh);
+    const panelSelector = `.${PLUGIN_PREFIX}dialog, #${PLUGIN_PREFIX}history-container`;
+    const observer = new win.MutationObserver(records => {
+      // Streamed answer changes cannot affect dialog controls or modal focus.
+      if (records.some(record => record.target === chatUI || record.target.closest?.(panelSelector))) refresh();
+    });
     observer.observe(chatUI, { childList: true, subtree: true });
     chatUI.addEventListener("keydown", keydown);
     const cleanup = () => { observer.disconnect(); chatUI.removeEventListener("keydown", keydown); win.removeEventListener("unload", cleanup); addon.data.paperAgentUICleanups?.delete(cleanup); };

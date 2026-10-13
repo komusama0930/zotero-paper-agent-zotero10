@@ -22,3 +22,7 @@ uploads PDFs to MinerU.
 Local build: python3 tools/fetch_upstream.py; python3 compatibility/build.py.
 Do not publish generated XPI files until complete corresponding source and all
 required license/build materials have been verified (docs/RELEASING.md).
+
+Streaming performance: bounded formula cache, coalesced/adaptive updates, stable
+Markdown block DOM, immediate completion flush, scroll preservation, and dialog
+observer filtering. The complete Markdown source is still parsed for references.

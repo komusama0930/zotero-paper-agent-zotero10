@@ -12,7 +12,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "paper-agent-v3.1.1.xpi"
 EXPECTED_SHA256 = "1e4d574c1df0b280bd666186ea58f4aa6232be9cb805677fb757111d525681f7"
-VERSION = "3.1.1.17"
+VERSION = "3.1.1.18"
 SCRIPT = "content/scripts/zoteropaperagent.js"
 
 
