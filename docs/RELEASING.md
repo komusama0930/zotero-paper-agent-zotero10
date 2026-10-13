@@ -26,3 +26,8 @@ Inspect the Git index and release archive for secrets and personal files. Run
 `python3 tools/check_publication.py` and the relevant tests. Release notes must
 state the derivative/unofficial status, changes, validation and known limitations.
 Do not silently repoint the retained upstream updater to an unverified channel.
+
+Vendored KaTeX distribution JS/CSS/fonts are a MIT-licensed dependency, not a
+redistributed upstream Zotero plugin binary. Keep its original license, version
+and source/provenance record. Do not edit the vendored library without documenting
+the modification; project math integration sources remain directly editable.

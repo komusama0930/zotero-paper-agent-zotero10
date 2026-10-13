@@ -15,3 +15,10 @@ The original GNU Affero General Public License text is in LICENSE.
 No upstream binary or generated modified binary is distributed in this repository.
 The public upstream source tag and official release bundle currently differ;
 complete corresponding source must be verified before any binary redistribution.
+
+Third-party math dependency: KaTeX 0.16.22, MIT License.
+Copyright (c) 2013-2020 Khan Academy and other contributors.
+Original license: compatibility/vendor/katex/LICENSE.
+Source: https://github.com/KaTeX/KaTeX/tree/v0.16.22
+The vendored official JS, CSS and fonts are unmodified dependency assets and
+retain the MIT license; they are not relicensed as project-authored AGPL code.

@@ -15,6 +15,7 @@
 - 七套可编辑的文献阅读提示词、可搜索的模型和提示词选择面板。
 - 打开侧栏默认新建本地对话，旧会话保留在历史中。
 - 流式及历史回答的 Markdown 排版，包括可滚动表格与代码块。
+- 本地 KaTeX 公式渲染：`$…$`、`$$…$$`、`\(...\)`、`\[...\]`；分数、积分、矩阵、长公式滚动及错误回退。
 - OpenAI 兼容 Chat Completions，以及可选 Responses 流式传输。
 
 ## 发布范围与上游源码差异
@@ -22,6 +23,8 @@
 **本仓库当前发布修改源码与构建工具，不发布 XPI 二进制、修改后的完整编译包或上游编译包。**
 
 上游公开 v3.1.1 标签对应的 TypeScript 源码与官方 v3.1.1 XPI 的模块结构和插件身份存在差异；当前无法据此确认正式包的完整对应源码。本项目不把编译 JavaScript 冒充完整对应源码，不宣称已完成二进制再分发所需的源码核验。发布二进制前，须核实完整对应源码、依赖和构建材料，并按 AGPL 的要求一并提供。参见 [发布流程](docs/RELEASING.md)。
+
+KaTeX 0.16.22 的官方发行库和字体按 MIT 许可证随源码项目保存，保留其原通知，详见 [依赖记录](docs/DEPENDENCIES.md)。它们属于第三方依赖，不是本项目声称原创的代码；公式无需访问 CDN。
 
 本仓库中的 Python 补丁、JavaScript/CSS 资产及 JSON 提示词是本项目修改的直接可编辑来源。它们针对上游公开发布的固定校验值 XPI，由使用者自行取得该包后本地应用；没有 API 密钥、聊天记录、个人文献或账号同步工具。
 
@@ -36,7 +39,7 @@ node --check compatibility/patched/content/scripts/zoteropaperagent.js
 node --test compatibility/tests/runtime.test.cjs
 ```
 
-下载脚本只访问上游官方 GitHub release，强制核验 SHA-256；已下载的文件亦重新核验。输出为 `dist/zotero-paper-agent-3.1.1.16.xpi`。生成文件与原包均不纳入版本控制。
+下载脚本只访问上游官方 GitHub release，强制核验 SHA-256；已下载的文件亦重新核验。输出为 `dist/zotero-paper-agent-3.1.1.17.xpi`。生成文件与原包均不纳入版本控制。
 
 在 Zotero「工具 → 插件」齿轮菜单选择「从文件安装插件」，安装本地生成的 XPI 后重启。**沿用上游插件 ID，会替换已有 Paper Agent 插件**。建议备份 Zotero 配置；回退时重新安装上游合适版本。本地包保留上游更新地址，未来上游更新可能替换这些修改，可在 Zotero 插件管理中关闭该插件自动更新。
 
@@ -48,9 +51,9 @@ node --test compatibility/tests/runtime.test.cjs
 
 ## 验证与限制
 
-测试环境：Zotero 10.0.6 / macOS。21项 Node 回归测试与44项隔离 Zotero 原生检查通过；后者使用合成 PDF 和模拟模型回答，不上传个人文献。云端 OCR及所有模型服务未做完整在线验证。Windows、Linux 和其他 Zotero 版本未验证。
+测试环境：Zotero 10.0.6 / macOS。23项 Node 回归测试与52项隔离 Zotero 原生检查通过；后者使用合成 PDF 和模拟模型回答，不上传个人文献。云端 OCR及所有模型服务未做完整在线验证。Windows、Linux 和其他 Zotero 版本未验证。
 
-本地 PDF 提取依赖 Zotero 内部 worker API，未来升级可能需要调整。扫描件、加密文件和长全文可能受提取能力或模型上下文长度限制。多窗口仍共享上游 API 状态，不保证独立并行会话。Markdown 支持基础结构，尚未新增数学公式或代码语法着色。
+本地 PDF 提取依赖 Zotero 内部 worker API，未来升级可能需要调整。扫描件、加密文件和长全文可能受提取能力或模型上下文长度限制。多窗口仍共享上游 API 状态，不保证独立并行会话。Markdown 支持基础结构及 KaTeX 数学公式，尚未新增代码语法着色；KaTeX 不支持全部 LaTeX 宏包。
 
 ## 参与
 

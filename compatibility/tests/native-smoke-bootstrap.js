@@ -144,7 +144,7 @@ async function startup() {
     await waitUntil(() => chat.querySelector("#zotero-paper-agent-send-message-button").style.display !== "none");
     await api.createChatSession();
     const markdownChatID = api.chatID;
-    const markdownAnswer = '# 研究结论\n\n**主要证据**和 *推断*。\n\n- 第一项\n  - 子项\n\n> 引用原文\n\n| 方法 | 结果 |\n| --- | --- |\n| A | 42 |\n\n```python\nprint("<safe>")\n```\n\n[原文](https://example.com)';
+    const markdownAnswer = '# 研究结论\n\n**主要证据**和 *推断*。\n\n- 第一项\n  - 子项\n\n> 引用原文\n\n| 方法 | 结果 |\n| --- | --- |\n| A | 42 |\n\n```python\nprint("<safe>")\n```\n\n[原文](https://example.com)' + "\n\n行内 $E=mc^2$ 和 \\(\\alpha+\\beta\\)。\n\n$$\n\\int_0^1 x^2\\,dx=\\frac{1}{3}\n$$\n\n\\[\n\\begin{pmatrix}a & b \\\\ c & d\\end{pmatrix}\n\\]\n\n`$literal$` 与 $\\unknowncommand{x}$。\n" + "\n\n\\[\\sum_{i=1}^{n} x_i^2 = a_{1}b_{1} + a_{2}b_{2} + a_{3}b_{3} + a_{4}b_{4} + a_{5}b_{5} + a_{6}b_{6} + a_{7}b_{7} + a_{8}b_{8} + a_{9}b_{9} + a_{10}b_{10} + a_{11}b_{11}\\]";
     api.completion = async ({streamCallback}) => {
       for (let i=0; i<markdownAnswer.length; i+=11) streamCallback({type:"content",content:markdownAnswer.slice(i,i+11)});
       return {userRefs:[]};
@@ -155,12 +155,19 @@ async function startup() {
     const answerNodes = () => [...chat.querySelectorAll(".zotero-paper-agent-message-item-text-item-content #zotero-paper-agent-message-item-text-item-text-container")];
     let markdownNode = answerNodes().find(node => node.querySelector("h1"));
     check("streamed Markdown renders headings emphasis lists quotes tables code and links", !!markdownNode && ["strong","em","ul ul","blockquote",".paper-agent-markdown-table table","pre code.language-python","a"].every(selector=>markdownNode.querySelector(selector)));
+    check("streamed formulas render all four TeX delimiter forms", markdownNode.querySelectorAll(".paper-agent-math .katex").length === 5);
+    check("formula renderer preserves accessible MathML and original TeX", markdownNode.querySelectorAll("math").length === 5 && markdownNode.querySelector('annotation[encoding="application/x-tex"]').textContent === "E=mc^2");
+    check("invalid TeX falls back to original source", markdownNode.querySelector(".paper-agent-math-source")?.textContent.includes("unknowncommand"));
+    check("formula fonts are loaded from packaged offline resources", await win.document.fonts.load('16px KaTeX_Main').then(fonts=>fonts.length>0));
     check("Markdown code is preserved as text", markdownNode.querySelector("pre code").textContent.includes('<safe>') && !markdownNode.querySelector("safe"));
     api.fullMessageListByChatSessionID(chat, markdownChatID);
     markdownNode = answerNodes().find(node => node.querySelector("h1"));
     check("restored history uses the same Markdown renderer", !!markdownNode?.querySelector(".paper-agent-markdown-table") && !!markdownNode.querySelector("pre code"));
+    check("history restores rendered formulas", markdownNode.querySelectorAll(".paper-agent-math .katex").length === 5);
     body.style.width = "260px";
     await Zotero.Promise.delay(150);
+    const displays = [...markdownNode.querySelectorAll(".paper-agent-math-display")];
+    check("long display formulas scroll within the narrow answer", displays.every(node=>node.clientWidth<=markdownNode.clientWidth) && displays.some(node=>node.scrollWidth>node.clientWidth));
     check("Markdown table stays within narrow answer", markdownNode.querySelector(".paper-agent-markdown-table").clientWidth <= markdownNode.clientWidth && chat.scrollWidth <= chat.clientWidth + 1);
     // Actual Zotero chrome theme variables, without injecting mock text colors.
     const rgb = value => value.match(/[\d.]+/g).map(Number);
@@ -184,6 +191,8 @@ async function startup() {
         input: contrast(inputStyles.color, inputStyles.backgroundColor),
         placeholder: contrast(placeholder.color, inputStyles.backgroundColor), hint: contrast(hint.color, background) };
       result.themeChecks.push(values);
+      const mathStyle = win.getComputedStyle(markdownNode.querySelector(".paper-agent-math"));
+      check(`${dark ? "dark" : "light"} formulas inherit readable theme text`, contrast(mathStyle.color, background) >= 4.5);
       const codeStyle = win.getComputedStyle(markdownNode.querySelector("pre code"));
       const preStyle = win.getComputedStyle(markdownNode.querySelector("pre"));
       const linkStyle = win.getComputedStyle(markdownNode.querySelector("a"));

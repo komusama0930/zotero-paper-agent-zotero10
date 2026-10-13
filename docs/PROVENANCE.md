@@ -28,3 +28,7 @@
 | compatibility/patches/x_markdown.py | Markdown 配置、表格和搜索高亮 |
 
 构建保留上游 JavaScript 内部的依赖许可证注释、manifest 作者和主页。沿用插件身份及更新地址为兼容既有数据的决定，非声明本项目是上游。
+
+## 公式扩展（2026-10-13）
+
+compatibility/patches/y_math.py 与 assets/math.js 添加四种 TeX 定界符、离线 KaTeX 渲染、代码/币值避让、错误与未闭合回退，以及不修改公式结构的文本高亮。第三方 KaTeX 来源与 MIT 通知见 docs/DEPENDENCIES.md，npm 包完整性已核验。

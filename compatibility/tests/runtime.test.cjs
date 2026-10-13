@@ -196,7 +196,7 @@ test('manifest permits Zotero 10 and preserves the identity and required update 
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'compatibility/patched/manifest.json')));
   assert.equal(manifest.applications.zotero.strict_max_version, '10.*');
   assert.equal(manifest.applications.zotero.id, 'zoteropaperagent@github.com');
-  assert.equal(manifest.version, '3.1.1.16');
+  assert.equal(manifest.version, '3.1.1.17');
   assert.equal(manifest.applications.zotero.update_url, 'https://github.com/windfollowingheart/zotero-paper-agent/releases/download/release/update.json');
 });
 
@@ -343,4 +343,44 @@ test('actual bundled Markdown engine renders answer structure, tables and partia
   const unsafe=ctx.renderMarkdownWithKeywords('<img src=x onerror=alert(1)>\n<script>alert(1)</script>\n[bad](javascript:alert(1))');
   assert.doesNotMatch(unsafe,/<img|<script|href="javascript:/);
   assert.match(ctx.renderMarkdownWithKeywords('**证据**', ['证据']),/keyword-highlight/);
+});
+
+function mathContext() {
+  const ctx=context({});
+  vm.runInContext(segment('  var __create =', '  // node_modules/jszip/dist/jszip.min.js'),ctx);
+  vm.runInContext(segment('  var markdownit = require_index_cjs4();','  // src/modules/ui/dialog/dialogui.ts'),ctx);
+  return ctx;
+}
+
+test('TeX inline/block delimiters render locally with fractions matrices and accessible MathML', () => {
+  const ctx=mathContext();
+  const text=String.raw`行内 $E=mc^2$ 与 \(\alpha+\beta\)。
+
+$$
+\int_0^1 x^2\,dx=\frac{1}{3}
+$$
+
+\[
+\begin{pmatrix}a & b \\ c & d\end{pmatrix}
+\]`;
+  const html=ctx.renderMarkdownWithKeywords(text);
+  assert.equal((html.match(/class="paper-agent-math /g)||[]).length,4);
+  assert.equal((html.match(/<math /g)||[]).length,4);
+  assert.match(html,/class="mfrac"/);assert.match(html,/class="mtable"/);
+  assert.match(html,/paper-agent-math-display/);
+  assert.match(ctx.renderMarkdownWithKeywords('$$x^2$$'),/paper-agent-math-display/);
+});
+
+test('formula parsing preserves code currency escaped dollars unfinished streams and invalid TeX', () => {
+  const ctx=mathContext();
+  for(const text of ['`$x$`','```tex\n$$x$$\n```','Price $5 and $10',String.raw`escaped \$x\$`,'unfinished $x','unfinished $$\n\\frac{a}']) {
+    assert.doesNotMatch(ctx.renderMarkdownWithKeywords(text),/class="katex"/);
+  }
+  const invalid=ctx.renderMarkdownWithKeywords(String.raw`$\unknowncommand{x}$`);
+  assert.match(invalid,/paper-agent-math-source/);assert.match(invalid,/unknowncommand/);
+  const dangerous=ctx.renderMarkdownWithKeywords(String.raw`$\href{javascript:alert(1)}{x}$ $\includegraphics{https://example.com/private.png}$`);
+  assert.doesNotMatch(dangerous,/<img|href="javascript:/);
+  const highlighted=ctx.renderMarkdownWithKeywords('$x^2$ x',['x']);
+  assert.equal((highlighted.match(/keyword-highlight/g)||[]).length,1);
+  assert.match(highlighted,/<math /);
 });

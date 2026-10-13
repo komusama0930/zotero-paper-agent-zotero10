@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
 /* Unofficial modifications maintained by komusama0930; 2026-10-13. See NOTICE. */
+@import url("katex/katex.min.css");
 /* Scoped styles loaded last; native Zotero colors keep light and dark themes in sync. */
 #zotero-paper-agent-chat-ui-container { width:100%; min-width:0; }
 #zotero-paper-agent-chat-ui {
@@ -169,3 +170,12 @@
 @media (prefers-color-scheme:dark) {
   #zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content a { color:#8ab4ff; }
 }
+
+/* Locally bundled math fonts; formulas inherit the native theme foreground. */
+#zotero-paper-agent-chat-ui .paper-agent-math { color:inherit; }
+#zotero-paper-agent-chat-ui .paper-agent-math-inline { font-size:1em; }
+#zotero-paper-agent-chat-ui .paper-agent-math-display { display:block; max-width:100%; overflow-x:auto; overflow-y:hidden; padding:8px 2px; margin:.6em 0; scrollbar-width:thin; }
+#zotero-paper-agent-chat-ui .paper-agent-math-display .katex-display { margin:0; min-width:max-content; }
+#zotero-paper-agent-chat-ui .paper-agent-math-source { white-space:pre-wrap; overflow-wrap:anywhere; font-family:ui-monospace,monospace; }
+#zotero-paper-agent-chat-ui .paper-agent-math .katex { font-size:1.1em; }
+#zotero-paper-agent-chat-ui .paper-agent-math .katex-html { user-select:none; }

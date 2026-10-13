@@ -31,7 +31,7 @@ prefs = {
 (profile / "user.js").write_text("".join(
     f"user_pref({json.dumps(key)}, {json.dumps(value)});\n" for key, value in prefs.items()
 ))
-shutil.copy2(ROOT / "dist/zotero-paper-agent-3.1.1.16.xpi",
+shutil.copy2(ROOT / "dist/zotero-paper-agent-3.1.1.17.xpi",
              profile / "extensions/zoteropaperagent@github.com.xpi")
 chunks = [b"%PDF-1.4\n"]
 offsets = []
