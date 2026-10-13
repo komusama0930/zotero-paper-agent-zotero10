@@ -2,7 +2,7 @@
 
 [English](README_EN.md) · [上游项目](https://github.com/windfollowingheart/zotero-paper-agent) · [许可证](LICENSE)
 
-这是基于 **windfollowingheart / Zotero Paper Agent** 的非官方兼容补丁项目，由 **komusama0930** 维护。原插件和主要功能属于上游作者；本项目公开我们新增的兼容性、文献阅读和界面修改，不代表上游官方版本，也不是从零开发的插件。
+这是基于 **windfollowingheart / Zotero Paper Agent** 的非官方兼容补丁项目。
 
 修改代码按 **AGPL-3.0-or-later** 发布。上游及依赖的版权、作者和许可证通知必须保留，详见 [NOTICE](NOTICE) 和 [来源记录](docs/PROVENANCE.md)。
 
