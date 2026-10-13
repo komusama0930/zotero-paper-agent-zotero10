@@ -1,0 +1,23 @@
+name: Patch checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python3 tools/check_publication.py
+      - run: python3 tools/fetch_upstream.py
+      - run: python3 compatibility/build.py
+      - run: node --check compatibility/patched/content/scripts/zoteropaperagent.js
+      - run: node --test compatibility/tests/runtime.test.cjs
+      # No binaries/generated files are published as CI artifacts.

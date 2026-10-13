@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.xpi
+*.sha256
+*.download
+*.bak
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+compatibility/patched/
+compatibility/changes.diff
+compatibility/tests/native-results*.json
+*.log

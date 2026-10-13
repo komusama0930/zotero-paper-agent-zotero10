@@ -1,0 +1,171 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Unofficial modifications maintained by komusama0930; 2026-10-13. See NOTICE. */
+/* Scoped styles loaded last; native Zotero colors keep light and dark themes in sync. */
+#zotero-paper-agent-chat-ui-container { width:100%; min-width:0; }
+#zotero-paper-agent-chat-ui {
+  --pa-accent:#5277d6;
+  color-scheme:light dark;
+  width:100%; max-width:100%; min-width:0; min-height:300px;
+  margin:0; padding:12px; gap:10px; border-radius:12px;
+  background:var(--color-background,#fff); color:var(--fill-primary,CanvasText);
+  border:1px solid var(--color-border,#dce2eb); font:13px/1.55 system-ui,sans-serif;
+  box-shadow:0 2px 8px rgb(0 0 0 / 4%); container-type:inline-size;
+}
+#zotero-paper-agent-chat-ui * { box-sizing:border-box; min-width:0; }
+#zotero-paper-agent-chat-ui button {
+  width:auto !important; height:auto !important; min-height:30px; margin:0 !important; padding:5px 9px;
+  border:1px solid var(--color-border,#dce2eb); border-radius:7px;
+  background:var(--color-toolbar,#f5f7fb); color:inherit; font:inherit;
+  line-height:1.3; cursor:pointer; white-space:normal; transition:background .15s;
+}
+#zotero-paper-agent-chat-ui button:hover { background:color-mix(in srgb,var(--pa-accent) 12%,var(--color-background,#fff)); }
+#zotero-paper-agent-chat-ui button:focus-visible,
+#zotero-paper-agent-chat-ui textarea:focus-visible { outline:2px solid var(--pa-accent); outline-offset:2px; }
+#zotero-paper-agent-chat-ui button:disabled { opacity:.5; cursor:default; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-header-container {
+  height:auto; flex:0 0 auto; flex-wrap:wrap; gap:8px; padding:0 0 10px;
+  background:transparent; align-items:center;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-model-display-container {
+  width:auto; height:auto; flex:1 1 140px; padding:0; font-size:13px; font-weight:650;
+  line-height:1.45; overflow-wrap:anywhere;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-header-button-container {
+  width:auto; height:auto; gap:6px; flex-wrap:wrap;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-message-container {
+  flex:1 1 0; min-height:60px; height:auto; padding:0 2px; overflow:auto; scrollbar-width:thin;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-message-item {
+  padding:10px; margin:0 0 12px; border:1px solid var(--color-border,#e2e7ef);
+  border-radius:10px; background:var(--color-toolbar,#f6f8fc); overflow-wrap:anywhere;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-message-item-text-container { padding:0; line-height:1.65; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-agent { max-width:100%; }
+#zotero-paper-agent-chat-ui pre { overflow:auto; max-width:100%; padding:10px; border-radius:6px; }
+#zotero-paper-agent-chat-ui img, #zotero-paper-agent-chat-ui table { max-width:100%; }
+#zotero-paper-agent-chat-ui blockquote { margin:8px 0; padding:4px 10px; border-left:3px solid var(--pa-accent); }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-file-container { flex:0 0 auto; max-height:90px; overflow:auto; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-tool-container {
+  width:100%; height:auto; flex:0 0 auto; display:flex; flex-wrap:wrap; gap:6px;
+  padding:0; overflow:visible; background:transparent;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-input-container {
+  width:100%; height:auto; flex:0 0 auto; display:flex; flex-direction:column; gap:8px; padding:0;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-input-textarea {
+  width:100%; height:clamp(90px,18vh,170px); min-height:70px; max-height:240px; resize:vertical;
+  padding:11px; margin:0; border:1px solid var(--color-border,#dce2eb); border-radius:10px;
+  background:var(--color-background,#fff); color:inherit; font:inherit; line-height:1.6; scrollbar-width:thin;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-input-container-button-container {
+  width:100%; height:auto; flex-direction:row; justify-content:flex-end; gap:7px; flex-wrap:wrap;
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-send-message-button {
+  background:var(--pa-accent); border-color:var(--pa-accent); color:#fff; padding-inline:18px;
+}
+#zotero-paper-agent-chat-ui .paper-agent-composer-hint { flex:0 0 auto; font-size:11px; color:var(--fill-secondary,GrayText); opacity:1; line-height:1.4; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-history-container { z-index:2; border-radius:10px; }
+
+#zotero-paper-agent-chat-ui #zotero-paper-agent-input-container #zotero-paper-agent-input-textarea { width:100%; height:clamp(90px,18vh,170px); }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-input-container #zotero-paper-agent-input-container-button-container { width:100%; height:auto; flex-direction:row; }
+
+/* Zotero uses fill-primary/secondary for text; do not use invented foreground variables. */
+#zotero-paper-agent-chat-ui :is(input, textarea, select) { color:var(--fill-primary,CanvasText); caret-color:var(--fill-primary,CanvasText); }
+#zotero-paper-agent-chat-ui :is(input, textarea)::placeholder { color:var(--fill-secondary,GrayText); opacity:1; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-model-display-container { color:var(--fill-primary,CanvasText); }
+#zotero-paper-agent-chat-ui a { color:LinkText; }
+/* Dialogs occupy the available pane, including narrow and dark reader panes. */
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog {
+  position:absolute!important; inset:8px!important; width:auto!important; height:auto!important;
+  max-height:calc(100% - 16px); transform:none!important; display:flex; flex-direction:column;
+  margin:0!important; padding:12px!important; gap:10px; border-radius:12px;
+  background:var(--color-background,Canvas)!important; color:var(--fill-primary,CanvasText)!important;
+  border:1px solid var(--color-border,#8994a5); box-shadow:0 8px 32px #0003; z-index:1001;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog[hidden],
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item[hidden] { display:none!important; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-header-container,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-bottom-button-container {
+  width:100%!important; height:auto!important; flex:0 0 auto; display:flex; gap:8px; align-items:center; justify-content:space-between; padding:0!important;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-title-container { width:auto!important; height:auto!important; flex:1; font-weight:650; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-container {
+  width:100%!important; height:auto!important; flex:1 1 0; min-height:0; overflow:auto; padding:2px!important;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item {
+  width:100%!important; height:auto!important; min-height:44px; padding:8px!important; margin-bottom:6px;
+  border:1px solid var(--color-border,#8994a5); border-radius:8px; gap:8px; flex-wrap:wrap; background:transparent!important;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-main-container {
+  width:auto!important; height:auto!important; flex:1 1 150px; flex-wrap:wrap; gap:6px;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-text-container,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-title,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-input-container {
+  width:100%!important; height:auto!important; padding:0!important; overflow-wrap:anywhere; white-space:normal;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-button-container { width:auto!important; height:auto!important; gap:4px; flex-wrap:wrap; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog input,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog textarea,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog select {
+  width:100%!important; max-width:100%; padding:8px!important; border:1px solid var(--color-border,#8994a5);
+  border-radius:7px; background:var(--color-background,Canvas)!important; color:var(--fill-primary,CanvasText)!important; font:inherit;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog textarea { height:140px!important; min-height:90px; resize:vertical; }
+#zotero-paper-agent-chat-ui .paper-agent-dialog-search { flex:0 0 auto; }
+#zotero-paper-agent-chat-ui [data-pa-selectable] .zotero-paper-agent-dialog-list-item-main-container { cursor:pointer; border-radius:4px; }
+#zotero-paper-agent-chat-ui [data-pa-selectable] .zotero-paper-agent-dialog-list-item-main-container:focus-visible { outline:2px solid var(--pa-accent); outline-offset:2px; }
+#zotero-paper-agent-chat-ui .paper-agent-parser-choice { display:block; margin-bottom:12px; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-history-container {
+  position:absolute!important; inset:8px!important; width:auto!important; height:auto!important; transform:none!important;
+  display:flex; flex-direction:column; padding:12px; gap:10px; z-index:1001;
+  background:var(--color-background,Canvas); color:var(--fill-primary,CanvasText); border:1px solid var(--color-border,#8994a5);
+}
+#zotero-paper-agent-chat-ui #zotero-paper-agent-history-container[hidden] { display:none!important; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-history-container-header { height:auto; width:100%; flex:0 0 auto; flex-wrap:wrap; gap:8px; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-history-list-container { flex:1; min-height:0; width:100%; height:auto; overflow:auto; }
+#zotero-paper-agent-chat-ui #zotero-paper-agent-history-container input { width:100%; background:var(--color-background,Canvas); color:var(--fill-primary,CanvasText); border:1px solid var(--color-border,#8994a5); border-radius:7px; padding:8px; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog { overflow:hidden; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item { display:block; flex:0 0 auto; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-main-container { width:100%!important; flex:none; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog-list-item-input-container { margin:0!important; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog input,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog textarea,
+#zotero-paper-agent-chat-ui .zotero-paper-agent-dialog select { margin:0!important; }
+/* Markdown answers, shared by streaming responses and restored history. */
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content #zotero-paper-agent-message-item-text-item-text-container {
+  display:block; padding:4px 0; line-height:1.7; overflow-wrap:anywhere;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content :is(h1,h2,h3,h4,h5,h6) {
+  margin:1.1em 0 .45em; line-height:1.4; font-weight:700; color:inherit;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content h1 { font-size:1.5em; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content h2 { font-size:1.3em; border-bottom:1px solid var(--color-border); padding-bottom:.3em; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content :is(h3,h4,h5,h6) { font-size:1.1em; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content p { margin:.6em 0; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content :is(ul,ol) { display:block; margin:.6em 0; padding-inline-start:1.8em; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content li { display:list-item; margin:.3em 0; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content li > :is(ul,ol) { margin:.25em 0; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content code {
+  font: .92em/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  padding:2px 5px; border-radius:4px; background:var(--color-quinary-on-background,var(--color-toolbar)); color:inherit;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content pre {
+  display:block; max-width:100%; margin:.8em 0; padding:12px;
+  background:var(--color-quinary-on-background,var(--color-toolbar)); border:1px solid var(--color-border);
+  white-space:pre; overflow:auto; scrollbar-width:thin;
+}
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content pre code { padding:0; background:transparent; white-space:pre; overflow-wrap:normal; word-break:normal; }
+#zotero-paper-agent-chat-ui .paper-agent-markdown-table { max-width:100%; overflow:auto; margin:.8em 0; scrollbar-width:thin; }
+#zotero-paper-agent-chat-ui .paper-agent-markdown-table table { display:table; width:100%; max-width:none; border-collapse:collapse; font-size:.95em; }
+#zotero-paper-agent-chat-ui .paper-agent-markdown-table :is(th,td) { padding:7px 9px; border:1px solid var(--color-border); min-width:80px; vertical-align:top; }
+#zotero-paper-agent-chat-ui .paper-agent-markdown-table th { font-weight:650; background:var(--color-toolbar); }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content blockquote { color:var(--fill-secondary,CanvasText); background:var(--color-toolbar); padding:5px 10px; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content a { color:var(--accent-azure,#66adff); text-decoration:underline; overflow-wrap:anywhere; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content hr { border:0; border-top:1px solid var(--color-border); margin:1em 0; }
+#zotero-paper-agent-chat-ui .paper-agent-markdown-table:focus-visible { outline:2px solid var(--pa-accent); outline-offset:2px; }
+#zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content a { color:#245ec7; }
+@media (prefers-color-scheme:dark) {
+  #zotero-paper-agent-chat-ui .zotero-paper-agent-message-item-text-item-content a { color:#8ab4ff; }
+}

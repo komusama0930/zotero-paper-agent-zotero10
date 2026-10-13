@@ -1,0 +1,17 @@
+Zotero Paper Agent — Zotero 10 compatibility patches
+
+Derived from Zotero Paper Agent by windfollowingheart (package author: wind).
+Upstream: https://github.com/windfollowingheart/zotero-paper-agent
+Upstream package declares: AGPL-3.0-or-later.
+This project's modifications are licensed AGPL-3.0-or-later.
+Modification maintainer: komusama0930; modifications dated 2026-10-12 through 2026-10-13.
+
+This is an unofficial compatibility patch project, not an official upstream release.
+Preserve upstream author attribution, copyright and license notices when applying
+or redistributing modifications. Upstream bundled dependencies retain their own
+licenses and notices; this notice does not relicense those dependencies.
+
+The original GNU Affero General Public License text is in LICENSE.
+No upstream binary or generated modified binary is distributed in this repository.
+The public upstream source tag and official release bundle currently differ;
+complete corresponding source must be verified before any binary redistribution.
